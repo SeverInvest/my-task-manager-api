@@ -1,0 +1,29 @@
+name: Tests my_task_manager
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  test_endpoints:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up GitHub Actions
+      uses: actions/checkout@v3
+    - name: Use Node.js 18.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18.x
+    - name: Start MongoDB
+      uses: supercharge/mongodb-github-action@1.6.0
+      with:
+        mongodb-version: '6.0.4'
+    - name: Installing Dependencies
+      run: yarn
+    - name: Installing wait-port
+      run: yarn global add wait-port
+    - name: Wait MongoDB
+      run: wait-port -t 30000 localhost:27017
+    - name: Run test endpoints
+      run: DB_URL=mongodb://127.0.0.1:27017/testdb USE_SSL=false USE_SSLVALIDATE=false yarn test
